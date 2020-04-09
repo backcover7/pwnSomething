@@ -46,9 +46,9 @@ log.info("Canary value is %d (%s)" % (canary, hex(canary)))
 # <process_hash> - Before overflow
 #                 +-------------+
 #                 |    ret      |
-#                 +-------------+
-#                 |   old_ebp   |
 #       ebp -->   +-------------+
+#                 |   old_ebp   |
+#                 +-------------+
 #                       ...
 #   ebp-0xC -->   +-------------+
 #                 |   canary    |
@@ -99,9 +99,9 @@ payload += 'B' * 12
 #                 | call_system |
 #                 +-------------+
 #                 |process_hash |
-#                 +-------------+  <---
+#       ebp -->   +-------------+  <---
 #                 |   old_ebp   |    |
-#       ebp -->   +-------------+  padding * 0xC
+#                 +-------------+  padding * 0xC
 #                       ...          |
 #   ebp-0xC -->   +-------------+  <---
 #                 |   canary    |
