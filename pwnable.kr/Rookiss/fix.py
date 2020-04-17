@@ -83,7 +83,7 @@ modify the retn addr
 +--------+                       |
 |  retn  |  -----------------------
 +--------+
-|        |  <- ebp+0x8 (esp@main)
+|        |  <- ebp@shellcode+0x8 (esp@main)
 +--------+
 
 However when perform the pushing of the shellcode, we will have 5 pushes, so the top of stack will be 0xffb0c740-0x4*5=0xffb0c72c.
@@ -103,7 +103,7 @@ However when perform the pushing of the shellcode, we will have 5 pushes, so the
 +--------+
 |        |  <- push eax
 +--------+
-|        |  <- ebp+0x8 (esp@main)
+|        |  <- ebp@shellcode+0x8 (esp@main)
 +--------+
 
 >>> from pwn import *
