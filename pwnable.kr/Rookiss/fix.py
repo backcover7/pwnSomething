@@ -70,19 +70,18 @@ modify the retn addr
 04:0010|      0xffb0c744 -> 0xffb0c804 -> 0xffb0d417 <- '/home/bc7/Desktop/fix'
 05:0014|      0xffb0c748 <- 0x1
 
-buf is at ebp@shellcode-0x1c
 +--------+
-|        |  <- ebp@shellcode - 0x1c
+|        |  <- ebp@shellcode - 0x1c # The start of the shellcode
 +--------+
    ...
 +--------+
-|        |  (ebp@shellcode-0x5) The end of the shellcode ---
-+--------+                                                |
-|        |                                                |
-+--------+                                           0x4*3+1=13
-|ebp@main|  <- ebp@shellcode                              |
-+--------+                                                |
-|  retn  |  ------------------------------------------------
+|        |  (ebp@shellcode-0x5) --- # The end of the shellcode 
++--------+                       |
+|        |                       |
++--------+                   0x4*3+1=13
+|ebp@main|  <- ebp@shellcode     |
++--------+                       |
+|  retn  |  -----------------------
 +--------+
 |        |  <- ebp+0x8 (esp@main)
 +--------+
