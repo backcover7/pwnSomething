@@ -5,7 +5,7 @@ poc = "????/???;${__=${_#?????}};$($__</???/__/?);${___=$_};$__<$___"
 
 '''
 ????/???        jail/cat
-$_              jail/cat
+$_              jail/cat        # could be the last param of previous command; and it will be the previous command if there was no params
 ${_#?????}      cat
 $__             cat
 $__</???/__/?   cat</tmp/___/1
