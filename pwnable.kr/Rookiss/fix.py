@@ -201,7 +201,6 @@ p.recvuntil("Can't open ")
 filename = p.recvline().strip("\n")
 with open(filename, "w") as f:
     f.write("sh\n")
-    # f.write("0\n")
     # f.write("/bin//sh\n")
 p.kill()
 # Second execution
