@@ -202,6 +202,7 @@ filename = p.recvline().strip("\n")
 with open(filename, "w") as f:
     f.write("sh\n")
     # f.write("/bin//sh\n")
+    # Or NULL character
 p.kill()
 # Second execution
 p = process("/home/fix/fix")
